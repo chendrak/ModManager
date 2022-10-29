@@ -14,7 +14,7 @@
     <PackageVersion>1.0.0</PackageVersion>
     <Authors>chendrak</Authors>
     <IsPackable>false</IsPackable>
-    <PackageId>RogueGenesiaModManager</PackageId>
+    <PackageId>ModManager</PackageId>
     <Nullable>enable</Nullable>
     <AssemblyName>ModManager</AssemblyName>
     <Product>ModManager</Product>
