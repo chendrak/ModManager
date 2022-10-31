@@ -49,7 +49,7 @@ internal static class UiManager
 
     public static UIBase UiBase { get; private set; }
 
-    private static ModListPanel? ModListPanel { get; set; }
+    public static ModListPanel? ModListPanel { get; set; }
 
     private static Button? ModButton { get; set; }
 

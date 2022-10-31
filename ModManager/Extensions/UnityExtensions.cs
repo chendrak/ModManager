@@ -52,9 +52,9 @@ public static class UnityExtensions
         return component;
     }
     
-    internal static T? GetChildComponentByName<T>(this MonoBehaviour go, string name) where T : Component
+    internal static T? GetChildComponentByName<T>(this MonoBehaviour mb, string name) where T : Component
     {
-        return go.GetComponentsInChildren<T>(true).FirstOrDefault(component => component.gameObject.name == name);
+        return mb.GetComponentsInChildren<T>(true).FirstOrDefault(component => component.gameObject.name == name);
     }
     
     internal static T? GetChildComponentByName<T>(this GameObject go, string name) where T : Component

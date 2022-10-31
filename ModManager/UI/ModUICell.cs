@@ -1,9 +1,9 @@
 using BepInEx;
 using ModManager.Helpers;
 using ModManager.UI.Base;
+using ModManager.UI.Extensions;
 using UnityEngine;
 using UnityEngine.UI;
-using UniverseLib;
 using UniverseLib.UI;
 using UniverseLib.UI.Models;
 
@@ -24,36 +24,41 @@ public class ModUICell : BaseUICell<PluginInfo>
 
     public override GameObject CreateContent(GameObject parent)
     {
-        UIRoot = UIFactory.CreateHorizontalGroup(parent, "ModCell", true,
+        UIRoot = UIFactory.CreateUIObject("ModCell", parent);
+        UIFactory.SetLayoutGroup<VerticalLayoutGroup>(UIRoot, true,
+            false, true, true, 2, 0, 0, 0, 0,
+            TextAnchor.MiddleCenter);
+        
+        UIRoot.SetActive(false);
+
+        var contentWrapper = UIFactory.CreateHorizontalGroup(UIRoot, "ContentWrapper", true,
             false, true, true, 2, default,
-            new Color(0.11f, 0.11f, 0.11f), TextAnchor.MiddleCenter);
+            Color.clear, TextAnchor.MiddleCenter);
         Rect = UIRoot.GetComponent<RectTransform>();
         Rect.anchorMin = new Vector2(0, 1);
         Rect.anchorMax = new Vector2(0, 1);
         Rect.pivot = new Vector2(0.5f, 1);
         Rect.sizeDelta = new Vector2(25, 25);
-        UIFactory.SetLayoutElement(UIRoot, minWidth: 100, flexibleWidth: 9999, minHeight: 25, flexibleHeight: 0);
 
-        UIRoot.SetActive(false);
-
-        GameObject textWrappers = UIFactory.CreateVerticalGroup(UIRoot.gameObject,
+        GameObject textWrappers = UIFactory.CreateVerticalGroup(contentWrapper,
             name: "TextWrapper", forceWidth: true, forceHeight: false,
             childControlWidth: true, childControlHeight: true,
-            spacing: 2, padding: default, bgColor: new Color(0.11f, 0.11f, 0.11f),
+            spacing: 2, padding: default, bgColor: Color.clear,
             childAlignment: TextAnchor.MiddleLeft
         );
 
         TitleText = UIFactory.CreateLabel(textWrappers, "TitleText", "Mod Title", fontSize: TitleFontSize);
         UIFactory.SetLayoutElement(TitleText.gameObject, flexibleWidth: 9999, minHeight: 25, flexibleHeight: 0);
-        TitleText.horizontalOverflow = HorizontalWrapMode.Overflow;
+        TitleText.horizontalOverflow = HorizontalWrapMode.Wrap;
         TitleText.font = GameResources.PixelFont;
-        
+        TitleText.color = Color.white;
+
         DescriptionText = UIFactory.CreateLabel(textWrappers, "DescriptionText", "Mod Description", fontSize: DescriptionFontSize);
         UIFactory.SetLayoutElement(DescriptionText.gameObject, flexibleWidth: 9999, minHeight: 25, flexibleHeight: 0);
-        DescriptionText.horizontalOverflow = HorizontalWrapMode.Overflow;
+        DescriptionText.horizontalOverflow = HorizontalWrapMode.Wrap;
         DescriptionText.font = GameResources.PixelFont;
 
-        DetailsButton = UIFactory.CreateButton(UIRoot, "ModDetailsButton", "?");
+        DetailsButton = UIFactory.CreateButton(contentWrapper, "ModDetailsButton", "?");
         DetailsButton.ButtonText.fontSize = DetailButtonFontSize;
         DetailsButton.ButtonText.font = GameResources.PixelFont;
         
@@ -61,17 +66,15 @@ public class ModUICell : BaseUICell<PluginInfo>
         
         DetailsButton.GameObject.SetActive(false);
         
-        Color normal = new(0.11f, 0.11f, 0.11f);
-        Color highlight = new(0.16f, 0.16f, 0.16f);
-        Color pressed = new(0.05f, 0.05f, 0.05f);
-        Color disabled = new(1, 1, 1, 0);
-        RuntimeHelper.SetColorBlock(DetailsButton.Component, normal, highlight, pressed, disabled);
+        UIRoot.RemoveBackgroundFromElements("ModCell", "TextWrapper", "ContentWrapper");
+        
+        var menuLine = UIFactory.CreateUIObject("ElementLine", UIRoot);
+        var img = menuLine.AddComponent<Image>();
+        img.color = GameResources.DefaultGray;
+        
+        UIFactory.SetLayoutElement(menuLine, minHeight: 2, flexibleWidth: 9999);
 
         return UIRoot;
-    }
-
-    private void OnDetailButtonClicked(RogueGenesiaMod data)
-    {
     }
 
     public override void Bind(PluginInfo obj)
@@ -83,8 +86,8 @@ public class ModUICell : BaseUICell<PluginInfo>
         if (obj.Instance is RogueGenesiaMod rogueGenesiaMod)
         {
             DescriptionText.text = rogueGenesiaMod.ModDescription();
-            DetailsButton.GameObject.SetActive(rogueGenesiaMod.HasDialog());
-            DetailsButton.OnClick = () => { OnDetailButtonClicked(rogueGenesiaMod); };
+            DetailsButton.GameObject.SetActive(rogueGenesiaMod.SupportsDetailButtonClick());
+            DetailsButton.OnClick = () => { rogueGenesiaMod.OnDetailButtonClicked(UiManager.ModListPanel!.ContentRoot); };
         }
         else
         {

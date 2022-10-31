@@ -3,6 +3,7 @@ using BepInEx;
 using BepInEx.Logging;
 using HarmonyLib;
 using ModManager.UI;
+using UnityEngine;
 
 namespace ModManager
 {
@@ -14,16 +15,17 @@ namespace ModManager
         public override void Load()
         {
             Log = base.Log;
-            Log.LogInfo($"Plugin {MyPluginInfo.PLUGIN_GUID} is loading! Patching!");
-            
             Harmony.CreateAndPatchAll(Assembly.GetExecutingAssembly());
-            // AddComponent<UiKeyPressHandler>();
-
             UiManager.Initialize();
-            
-            Log.LogInfo($"Plugin {MyPluginInfo.PLUGIN_GUID} is loaded!");
         }
 
-        public override string ModDescription() => "A mod that allows helps with other mods";
+        public override string ModDescription() => "A Mod for Rogue Genesia that can help manage other Mods for Rogue Genesia";
+
+        public override bool SupportsDetailButtonClick() => false;
+
+        public override void OnDetailButtonClicked(GameObject modManagerDialog)
+        {
+            Log.LogInfo("Detail button clicked");
+        }
     }
 }
