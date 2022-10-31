@@ -1,5 +1,4 @@
 <Project Sdk="Microsoft.NET.Sdk">
-
   <PropertyGroup>
     <TargetFramework>net6.0</TargetFramework>
     <Description>A Mod for Rogue Genesia that can manage other Mods for Rogue Genesia</Description>

@@ -43,8 +43,6 @@ public class ModListPanel : UniverseLib.UI.Panels.PanelBase
 
     protected override void ConstructPanelContent()
     {
-        RogueGenesiaModManager.Log.LogInfo("ConstructPanelContent");
-        
         #region TitleArea
         GameObject navbarPanel = UIFactory.CreateUIObject("MainNavbar", ContentRoot);
         UIFactory.SetLayoutGroup<VerticalLayoutGroup>(navbarPanel, true, false, true, true, 2, 5, 5, 6, 6,
@@ -87,15 +85,6 @@ public class ModListPanel : UniverseLib.UI.Panels.PanelBase
         CloseBtn.Component.image.sprite = GameResources.DefaultButtonSprite;
         CloseBtn.Component.spriteState = GameResources.DefaultSpriteState;
         #endregion
-        
-        var bgImages = UIRoot.GetComponentsInChildren<Image>();
-        if (bgImages != null)
-        {
-            foreach (var bgImage in bgImages)
-            {
-                Logger.LogInfo($"Image: {bgImage.name}, Color: #{UiHelper.ToHex(bgImage.color)}");
-            }
-        }
     }
 
     private List<PluginInfo> GetModEntries() => ModListController.PluginInfos;

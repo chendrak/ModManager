@@ -75,7 +75,6 @@ internal static class UiManager
 
     static void OnInitialized()
     {
-        Logger.LogInfo("UIManager.OnInitialized");
         UiBase = UniversalUI.RegisterUI(MyPluginInfo.PLUGIN_GUID, UiUpdate);
     }
 
@@ -83,12 +82,6 @@ internal static class UiManager
     {
         if (buttonTemplate)
         {
-            Logger.LogInfo($"Got the template for the mod button!");
-
-            var buttonTemplateParent = buttonTemplate.transform.parent.gameObject;
-
-            Logger.LogInfo($"buttonTemplateParent.name: {buttonTemplateParent.name}");
-
             ModButton = Object.Instantiate(buttonTemplate, parent.transform, false);
             ModButton.name = "ModsButton";
 
@@ -100,12 +93,11 @@ internal static class UiManager
             if (image)
             {
                 image.name = "ModImage";
-                var iconSprite = SpriteHelper.LoadSpriteFromFile(Path.Combine(Paths.Assets, "icon.png"));
-                image.sprite = iconSprite;
+                image.sprite = ModManagerResource.CogwheelIcon;
             }
             else
             {
-                Logger.LogInfo("No image!");
+                Logger.LogWarning("No image to replace :/");
             }
 
             // Reposition button
@@ -116,8 +108,6 @@ internal static class UiManager
                 var size = transForm.sizeDelta;
                 var newPosition = new Vector2(position.x, position.y + size.y);
                 transForm.position = newPosition;
-
-                Logger.LogInfo($"Mod button position: x: {newPosition.x}, y: {newPosition.y} ");
             }
 
             // Set click listener
