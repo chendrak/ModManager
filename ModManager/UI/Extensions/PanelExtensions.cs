@@ -1,4 +1,5 @@
 using System.Linq;
+using ModManager.Helpers;
 using UnityEngine;
 using UnityEngine.UI;
 using UniverseLib.UI.Panels;
@@ -16,7 +17,7 @@ public static class PanelExtensions
             return true;
         }
         
-        RogueGenesiaModManager.Log.LogError("Could not find bg image");
+        Log.Error("Could not find bg image");
         return false;
     }
 

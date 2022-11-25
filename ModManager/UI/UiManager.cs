@@ -1,6 +1,6 @@
 #nullable enable
+using System.Collections;
 using System.IO;
-using BepInEx.Logging;
 using HarmonyLib;
 using Il2CppInterop.Runtime.Injection;
 using RogueGenesia.UI;
@@ -20,42 +20,23 @@ internal static class UiManagerMainMenuHooks
     [HarmonyPatch(typeof(MainMenuManager), nameof(MainMenuManager.Start))]
     public static void OnMainMenuManagerStartCalled(MainMenuManager __instance)
     {
-        RogueGenesiaModManager.Log.LogInfo($"OnMainMenuManagerStartCalled({__instance.GetHashCode()})");
-
-        UiManager.mainMenuManager = __instance;
-
-        var buttons = __instance.MainMenu.GetComponentsInChildren<Button>();
-        if (buttons != null)
-        {
-            foreach (var button in buttons)
-            {
-                switch (button.name)
-                {
-                    case "Play":
-                        button.gameObject.GetOrAddComponent<UiManager.PlayButtonVisibilityListener>();
-                        break;
-                    case "Join Discord":
-                        UiManager.buttonTemplate = button;
-                        break;
-                }
-            }
-        }
+        Log.Info($"OnMainMenuManagerStartCalled({__instance.GetHashCode()})");
+        UiManager._mainMenuManager = __instance;
     }
 }
 
 internal static class UiManager
 {
-    private static ManualLogSource Logger => RogueGenesiaModManager.Log;
-
     public static UIBase UiBase { get; private set; }
 
     public static ModListPanel? ModListPanel { get; set; }
 
     private static Button? ModButton { get; set; }
 
-    internal static Button? buttonTemplate;
+    internal static Button? _playButton;
+    internal static Button? _buttonTemplate;
 
-    internal static MainMenuManager? mainMenuManager;
+    internal static MainMenuManager? _mainMenuManager;
 
     internal static void Initialize()
     {
@@ -76,13 +57,14 @@ internal static class UiManager
     static void OnInitialized()
     {
         UiBase = UniversalUI.RegisterUI(MyPluginInfo.PLUGIN_GUID, UiUpdate);
+        CoroutineHelper.StartCoroutine(LocateButtons());
     }
 
     internal static void CreateModButton(GameObject parent)
     {
-        if (buttonTemplate)
+        if (_buttonTemplate)
         {
-            ModButton = Object.Instantiate(buttonTemplate, parent.transform, false);
+            ModButton = Object.Instantiate(_buttonTemplate, parent.transform, false);
             ModButton.name = "ModsButton";
 
             var buttonText = ModButton.GetComponentInChildren<Text>();
@@ -97,7 +79,7 @@ internal static class UiManager
             }
             else
             {
-                Logger.LogWarning("No image to replace :/");
+                Log.Warn("No image to replace :/");
             }
 
             // Reposition button
@@ -113,16 +95,17 @@ internal static class UiManager
             // Set click listener
             ModButton.onClick = new Button.ButtonClickedEvent();
             ModButton.onClick.AddListener(ShowModList);
+            ModButton.gameObject.SetActive(false);
         }
         else
         {
-            Logger.LogError($"NO MOD BUTTON TEMPLATE FOUND :(");
+            Log.Error($"NO MOD BUTTON TEMPLATE FOUND :(");
         }
     }
 
     static void LogHandler(string message, LogType type)
     {
-        Logger.LogInfo(message);
+        Log.Info(message);
     }
 
     internal static void CreateAllPanels()
@@ -152,29 +135,68 @@ internal static class UiManager
         // Called once per frame when your UI is being displayed.
     }
 
+    private static IEnumerator ShowModButton()
+    {
+        while (ModButton == null) yield return new WaitForSeconds(0.1f);
+        ModButton.OnEnable();
+        ModButton.gameObject.SetActive(true);
+    }
+
+    private static IEnumerator HideModButton()
+    {
+        while (ModButton == null) yield return new WaitForSeconds(0.1f);
+        ModButton.OnDisable();
+        ModButton.gameObject.SetActive(false);
+    }
+
     public class PlayButtonVisibilityListener : MonoBehaviour
     {
         private void OnEnable()
         {
-            if (ModButton == null)
-            {
-                CreateModButton(UiBase.RootObject);
-            }
-
-            ModButton.OnEnable();
-            ModButton.gameObject.SetActive(true);
+            CoroutineHelper.StartCoroutine(ShowModButton());
         }
-
+        
         private void OnDisable()
         {
-            ModButton.OnDisable();
-            ModButton.gameObject.SetActive(false);
+            CoroutineHelper.StartCoroutine(HideModButton());
         }
 
         private void OnDestroy()
         {
-            buttonTemplate = null;
-            mainMenuManager = null;
+            _buttonTemplate = null;
+            _playButton = null;
+            _mainMenuManager = null;
         }
+    }
+
+    public static IEnumerator LocateButtons()
+    {
+        while (_buttonTemplate == null || _playButton == null)
+        {
+            if (_mainMenuManager != null)
+            {
+                var buttons = _mainMenuManager.MainMenu.GetComponentsInChildren<Button>();
+                if (buttons != null)
+                {
+                    foreach (var button in buttons)
+                    {
+                        switch (button.name)
+                        {
+                            case "Play":
+                                _playButton = button;
+                                _playButton.gameObject.GetOrAddComponent<UiManager.PlayButtonVisibilityListener>();
+                                break;
+                            case "Join Discord":
+                                _buttonTemplate = button;
+                                break;
+                        }
+                    }
+                }
+            }
+
+            yield return new WaitForSeconds(0.1f);
+        }
+        
+        CreateModButton(UiBase.RootObject);
     }
 }

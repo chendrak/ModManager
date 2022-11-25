@@ -6,7 +6,7 @@ namespace ModManager.Helpers;
 public static class SpriteHelper
 {
     public static Texture2D LoadPNGIntoTexture(string filePath) {
-        RogueGenesiaModManager.Log.LogInfo($"Loading PNG from {filePath}");
+        Log.Info($"Loading PNG from {filePath}");
         Texture2D tex = null;
 
         if (File.Exists(filePath)) {
@@ -21,12 +21,12 @@ public static class SpriteHelper
             }
             else
             {
-                RogueGenesiaModManager.Log.LogError($"Texture couldn't be loaded: {filePath}");
+                Log.Error($"Texture couldn't be loaded: {filePath}");
             }
         }
         else
         {
-            RogueGenesiaModManager.Log.LogError($"Texture file does not exist: {filePath}");
+            Log.Error($"Texture file does not exist: {filePath}");
         }
 
         return tex;
