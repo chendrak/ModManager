@@ -37,3 +37,12 @@ namespace MyMod
     }
 }
 ```
+
+### Changelog
+
+#### 1.0.1
+- Add R2modman & Thunderstore Mod Manager support
+- Improved locating existing game elements to show the mod button. It will now consistently show up.
+
+#### 1.0.0
+- Initial release
