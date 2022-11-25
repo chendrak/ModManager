@@ -9,7 +9,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="BepInEx.Unity.IL2CPP" Version="6.0.0-be.662" />
-    <PackageReference Include="RogueGenesia.Mod" Version="1.0.63" />
+    <PackageReference Include="BepInEx.Unity.IL2CPP" Version="6.0.0-be.*" />
+    <PackageReference Include="RogueGenesia.Mod" Version="1.0.*" />
   </ItemGroup>
 </Project>
