@@ -15,8 +15,6 @@ public class ModListPanel : UniverseLib.UI.Panels.PanelBase
 {
     private const int TitleFontSize = 32;
     private const int CloseButtonFontSize = 20;
-    
-    private ManualLogSource Logger => RogueGenesiaModManager.Log;
 
     public static ModListPanel Instance { get; private set; }
 

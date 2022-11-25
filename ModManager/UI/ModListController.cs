@@ -3,7 +3,7 @@ using System.Linq;
 using BepInEx;
 using BepInEx.Unity.IL2CPP;
 
-namespace ModManager;
+namespace ModManager.UI;
 
 public static class ModListController
 {
